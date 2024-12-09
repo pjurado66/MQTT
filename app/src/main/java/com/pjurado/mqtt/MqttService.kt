@@ -17,14 +17,29 @@ import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence
 
 class MqttService(val context: Context, val idClient: String) {
     //mqtt://pjurado:qFJwgVfiLS52jgK2@pjurado.cloud.shiftr.io
-    private val MQTT_SERVER_URI = "tcp://pjurado.cloud.shiftr.io:1883"
-    private val MQTT_USER = "pjurado"
-    private val MQTT_PASS = "qFJwgVfiLS52jgK2"
+    // private val MQTT_SERVER_URI = "tcp://test.mosquitto.org:1883"
+
+    //Configuración shiftr.io
+//    private val MQTT_SERVER_URI = "tcp://pjurado.cloud.shiftr.io:1883"
+//    private val MQTT_USER = "pjurado"
+//    private val MQTT_PASS = "xxxx"
+//    private val TAG = "MqttService"
+
+//    private val MQTT_SERVER_URI = "tcp://test.mosquitto.org:1883"
+//    private val TAG = "MqttService"
+
+    //Configuración servidor departamento
+    //    private val MQTT_SERVER_URI = "tcp://192.168.100.101:1883"
+    private val MQTT_SERVER_URI = "tcp://ieshm.mooo.com:1883"
+    private val MQTT_USER = "mqtt"
+    private val MQTT_PASS = "mqtt"
     private val TAG = "MqttService"
+
     private lateinit var client: MqttClient
 
     fun connect() {
         try {
+            Log.d(TAG, "Connecting to $MQTT_SERVER_URI")
             // Set up the persistence layer
             val persistence = MemoryPersistence();
 
@@ -52,15 +67,17 @@ class MqttService(val context: Context, val idClient: String) {
                     }
 
                     override fun deliveryComplete(token: IMqttDeliveryToken?) {
-
+                        Log.d(TAG, "Delivery complete")
                     }
                 })
 
             } catch (e: MqttException) {
                 e.printStackTrace()
+                Log.d(TAG, "Error al conectar. ${e.message}")
             }
         } catch (e : MqttException ) {
             e.printStackTrace();
+            Log.d(TAG, "Error al conectar. ${e.message}")
         }
     }
 
@@ -82,13 +99,14 @@ class MqttService(val context: Context, val idClient: String) {
         }
     }
 
-    fun subscribe(topic: String, qos: Int = 1) {
+    fun subscribe(topic: String, qos: Int = 1, listener: (String) -> Unit){
         try {
             client.subscribe(topic, qos, object : IMqttMessageListener {
 
 
                 override fun messageArrived(topic: String?, message: MqttMessage?) {
                     Log.d(TAG, "Receive message al conectar: ${message.toString()} from topic: $topic")
+                    listener(message.toString())
                 }
             })
         } catch (e: MqttException) {

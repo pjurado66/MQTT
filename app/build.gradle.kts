@@ -5,7 +5,7 @@ plugins {
 
 android {
     namespace = "com.pjurado.mqtt"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.pjurado.mqtt"
